@@ -23,22 +23,22 @@ set(LIBS
   MLIRIR
 )
 
-add_executable(md
-  md.cpp
-)
-
-target_link_libraries(md ${LIBS})
-
-llvm_update_compile_flags(md)
-
-mlir_check_all_link_libraries(md)
-
-# add_executable(dataflow
-#   dataflow.cpp
+# add_executable(foo
+#   foo.cpp
 # )
 # 
-# target_link_libraries(dataflow ${LIBS})
+# target_link_libraries(foo ${LIBS})
 # 
-# llvm_update_compile_flags(dataflow)
+# llvm_update_compile_flags(foo)
 # 
-# mlir_check_all_link_libraries(dataflow)
+# mlir_check_all_link_libraries(foo)
+
+add_executable(dependence
+  dependence.cpp
+)
+
+target_link_libraries(dependence ${LIBS})
+
+llvm_update_compile_flags(dependence)
+
+mlir_check_all_link_libraries(dependence)

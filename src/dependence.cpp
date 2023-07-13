@@ -1,4 +1,4 @@
-#include "dataflow.h"
+#include "dependence.h"
 #include "mlir/Analysis/Presburger/PresburgerRelation.h"
 #include "mlir/Analysis/Presburger/PresburgerSpace.h"
 
@@ -14,19 +14,18 @@ void DataflowAnalysis::compute() {
 
     unsigned j = mustSources.size() - 1;
     for(; j >= 0; j--) {
-      // TODO: If mustSources[j] cannot precede sink at this level, we have
-      // nothing to do
+      // TODO: If mustSources[j] cannot precede sink at this level continue
       PresburgerRelation T = lastSource(mustNoSource, mustSources[j], level);
       mustDeps[j].unionInPlace(T);
 
-      if(intermediateSources(mustDeps, j, level) < 0) {
+      if(!intermediateSources(mustDeps, j, level)) {
         // TODO: Error
       }
 
       T = lastSource(mayNoSource, mustSources[j], level);
       mayDeps[j].unionInPlace(T);
 
-      if(intermediateSources(mayDeps, j, level) < 0) {
+      if(!intermediateSources(mayDeps, j, level)) {
         // TODO: Error
       }
 
@@ -36,19 +35,17 @@ void DataflowAnalysis::compute() {
     }
 
     for(; j >= 0; j--) {
-      // TODO: If mustSources[j] cannot precede sink at this level, we have
-      // nothing to do
-      if(intermediateSources(mustDeps, j, level) < 0) {
+      // TODO: If mustSources[j] cannot precede sink at this level continue
+      if(!intermediateSources(mustDeps, j, level)) {
         // TODO: Error
       }
-      if(intermediateSources(mayDeps, j, level) < 0) {
+      if(!intermediateSources(mayDeps, j, level)) {
         // TODO: Error
       }
     }
 
     for(j = 0; j < maySources.size(); j++) {
-      // TODO: If maySources[j] cannot precede sink at this level, we have
-      // nothing to do
+      // TODO: If maySources[j] cannot precede sink at this level continue
       PresburgerRelation T = allSources(0, j, level);
       depMaps.maySourceMayDeps[j].unionInPlace(T);
       T = allSources(1, j, level);
@@ -89,9 +86,9 @@ bool DataflowAnalysis::intermediateSources(std::vector<PresburgerRelation>& sink
   for(int k = j - 1; k >= 0; k--) {
     // TODO: if sinkLevelDeps[k] cannot occur before sink at sinkLevel continue
     for(int level = sinkLevel; level <= depth; level++) {
-      // TOOD: if sinkLevelDeps[k] cannot occuer before sinkLevelDeps[j] at this level
+      // TODO: if sinkLevelDeps[k] cannot occur before sinkLevelDeps[j] at this level
       // continue
-      PresburgerSet trest();
+      PresburgerSet trest = PresburgerSet::getEmpty(sinkLevelDeps[j].getSpace().getRangeSpace());
       PresburgerRelation T = lastLaterSource(j, sinkLevel, k, trest);
       if(T.isIntegerEmpty()) {
         continue;
@@ -109,6 +106,8 @@ PresburgerRelation DataflowAnalysis::allSources(unsigned must, unsigned j, unsig
 }
 
 PresburgerRelation DataflowAnalysis::allIntermediateSources(std::vector<PresburgerRelation> mustDeps, std::vector<PresburgerRelation> mayDeps, unsigned j, unsigned level) {
+  for(int k = 0; k < ; ) {
+  }
 }
 
 PresburgerRelation DataflowAnalysis::allLaterSources(std::vector<PresburgerRelation> mustDeps, std::vector<PresburgerRelation> mayDeps, unsigned j, unsigned level) {
