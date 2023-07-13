@@ -10,7 +10,7 @@ using mlir::presburger::PresburgerSpace;
 using mlir::presburger::PresburgerRelation;
 using mlir::presburger::PresburgerSet;
 
-class DataflowAnalysis {
+class DependenceAnalysis {
   private:
     PresburgerRelation sink;
     ArrayRef<PresburgerRelation> mustSources, maySources;
@@ -29,9 +29,9 @@ class DataflowAnalysis {
     PresburgerRelation allSources(unsigned must, unsigned j, unsigned level);
     PresburgerRelation allIntermediateSources(std::vector<PresburgerRelation>, std::vector<PresburgerRelation>, unsigned, unsigned);
     PresburgerRelation lastLaterSource(int j, int sinkLevel, int k, PresburgerSet trest);
-    PresburgerRelation allLaterSources();
+    PresburgerRelation allLaterSources(std::vector<PresburgerRelation> mustDeps, std::vector<PresburgerRelation> mayDeps, unsigned j, unsigned level);
   public:
-    DataflowAnalysis(PresburgerRelation sink, ArrayRef<PresburgerRelation> maySources,
+    DependenceAnalysis(PresburgerRelation sink, ArrayRef<PresburgerRelation> maySources,
         ArrayRef<PresburgerRelation> mustSources) : sink(sink),
     mustSources(mustSources), maySources(maySources),
     mustNoSource(PresburgerSet::getEmpty(sink.getSpace().getDomainSpace())),

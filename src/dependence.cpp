@@ -2,7 +2,7 @@
 #include "mlir/Analysis/Presburger/PresburgerRelation.h"
 #include "mlir/Analysis/Presburger/PresburgerSpace.h"
 
-void DataflowAnalysis::compute() {
+void DependenceAnalysis::compute() {
   unsigned depth = 2 * sink.getNumDomainVars() + 1;
   for(unsigned level = depth; level >= 1; level--) {
     std::vector<PresburgerRelation> mustDeps, mayDeps;
@@ -72,12 +72,12 @@ void DataflowAnalysis::compute() {
 }
 
 // TODO: update mustNoSource/mayNoSource
-PresburgerRelation DataflowAnalysis::lastSource(PresburgerSet& set_c, PresburgerRelation source, unsigned level) {
+PresburgerRelation DependenceAnalysis::lastSource(PresburgerSet& set_c, PresburgerRelation source, unsigned level) {
   source.applyDomain(sink);
   // TODO: filter depMap after and compute lexmax
 }
 
-bool DataflowAnalysis::intermediateSources(std::vector<PresburgerRelation>& sinkLevelDeps, unsigned j, unsigned sinkLevel) {
+bool DependenceAnalysis::intermediateSources(std::vector<PresburgerRelation>& sinkLevelDeps, unsigned j, unsigned sinkLevel) {
   // TODO: sanity checks
   if(sinkLevelDeps[j].isIntegerEmpty()) {
     return true;
@@ -99,16 +99,14 @@ bool DataflowAnalysis::intermediateSources(std::vector<PresburgerRelation>& sink
   }
 }
 
-PresburgerRelation DataflowAnalysis::lastLaterSource(int j, int sinkLevel, int k, PresburgerSet empty) {
+PresburgerRelation DependenceAnalysis::lastLaterSource(int j, int sinkLevel, int k, PresburgerSet empty) {
 }
 
-PresburgerRelation DataflowAnalysis::allSources(unsigned must, unsigned j, unsigned level) {
+PresburgerRelation DependenceAnalysis::allSources(unsigned must, unsigned j, unsigned level) {
 }
 
-PresburgerRelation DataflowAnalysis::allIntermediateSources(std::vector<PresburgerRelation> mustDeps, std::vector<PresburgerRelation> mayDeps, unsigned j, unsigned level) {
-  for(int k = 0; k < ; ) {
-  }
+PresburgerRelation DependenceAnalysis::allIntermediateSources(std::vector<PresburgerRelation> mustDeps, std::vector<PresburgerRelation> mayDeps, unsigned j, unsigned level) {
 }
 
-PresburgerRelation DataflowAnalysis::allLaterSources(std::vector<PresburgerRelation> mustDeps, std::vector<PresburgerRelation> mayDeps, unsigned j, unsigned level) {
+PresburgerRelation DependenceAnalysis::allLaterSources(std::vector<PresburgerRelation> mustDeps, std::vector<PresburgerRelation> mayDeps, unsigned j, unsigned level) {
 }
