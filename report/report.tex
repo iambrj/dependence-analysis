@@ -1,0 +1,44 @@
+\documentclass[12pt]{article}
+\usepackage[parfill]{parskip}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{algpseudocode}
+
+\author{Bharathi Ramana Joshi}
+\title{Lazy Data-flow Analysis in MLIR}
+\date{\today}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+  Abstract goes here
+\end{abstract}
+
+\section{Algorithm}
+In this section we describe the algorithm to compute the data-flow dependencies.
+\begin{algorithmic}[1]
+  \Function{computeDeps}{$sink$, $maySources$, $mustSources$}
+    \For{each sink level $l$ innermost to outermost}
+      % \State Initialize possible must-source must dependencies and must-source may
+      %        dependencies to empty maps $mustRel$ and $mayRel$ respectively
+      \For{each must source $S_j$ in $mustSources.reverse()$}
+        \State Compute last iterations of $S_j$ preceding $sink$ at $l$
+        \State Add result to possible deps at $l$ of $S_j$
+        \For{each must source $S_k$ from $S_j$ to $mustSources.begin()$}
+          \For{each level $l'$ from $l$ to innermost of $S_j$}
+            \State Compute last iteration of $S_k$ between $S_j$ and $sink$ at $l'$
+            \State Update possible deps of $S_j$ and $S_k$
+          \EndFor
+        \EndFor
+      \EndFor
+      \For{each may source $S_j$ in $maySources$}
+        \State Compute \& update dependencies of $S_j$ at $l$
+        \State If $S_j$ occurs b/w possible must dependencies and $sink$ at $l$
+        convert the possible must dependencies into may dependencies
+      \EndFor
+    \EndFor
+  \EndFunction
+\end{algorithmic}
+
+\end{document}
+
