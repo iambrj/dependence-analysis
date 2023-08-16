@@ -4,11 +4,13 @@
 #include "llvm/ADT/ArrayRef.h"
 #include "mlir/Analysis/Presburger/PresburgerRelation.h"
 #include "mlir/Analysis/Presburger/PresburgerSpace.h"
+#include "mlir/Analysis/Presburger/Simplex.h"
 
 using llvm::ArrayRef;
 using mlir::presburger::PresburgerSpace;
 using mlir::presburger::PresburgerRelation;
 using mlir::presburger::PresburgerSet;
+using mlir::presburger::SymbolicLexOpt;
 
 class DependenceAnalysis {
   private:
@@ -38,15 +40,15 @@ class DependenceAnalysis {
     mayNoSource(PresburgerSet::getEmpty(sink.getSpace().getDomainSpace())) {
       // mustNoSource initially has all of sink's domain
       for(auto ir : sink.getAllDisjuncts()) {
-        mustNoSource.unionInPlace(PresburgerSet(ir.getDomainSet()));
+        mustNoSource.unionInPlace(ir.getDomainSet());
       }
       for(int i = 0, sz = mustSources.size(); i < sz; i++) {
-        PresburgerSpace s = PresburgerSpace::getRelationSpace(sink.getNumDomainVars(), mustSources[i].getNumRangeVars());
+        PresburgerSpace s = PresburgerSpace::getRelationSpace(mustSources[i].getNumDomainVars(), sink.getNumDomainVars());
         depMaps.mustSourceMustDeps.push_back(PresburgerRelation::getEmpty(s));
         depMaps.mustSourceMayDeps.push_back(PresburgerRelation::getEmpty(s));
       }
       for(int i = 0, sz = maySources.size(); i < sz; i++) {
-        PresburgerSpace s = PresburgerSpace::getRelationSpace(sink.getNumDomainVars(), mustSources[i].getNumRangeVars());
+        PresburgerSpace s = PresburgerSpace::getRelationSpace(mustSources[i].getNumDomainVars(), sink.getNumDomainVars());
         depMaps.maySourceMayDeps.push_back(PresburgerRelation::getEmpty(s));
       }
     }
