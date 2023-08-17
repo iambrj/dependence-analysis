@@ -125,22 +125,20 @@ PresburgerRelation DependenceAnalysis::lastSource(PresburgerSet& set_C, Presburg
 }
 
 bool DependenceAnalysis::intermediateSources(std::vector<PresburgerRelation>& sinkLevelDeps, unsigned j, unsigned sinkLevel) {
-  // TODO: sanity checks
   if(sinkLevelDeps[j].isIntegerEmpty()) {
     return true;
   }
   int depth = 2 * mustSources[j].getNumDomainVars() + 1;
   for(int k = j - 1; k >= 0; k--) {
-    // TODO: if sinkLevelDeps[k] cannot occur before sink at sinkLevel continue
+    // TODO: if sourceK cannot preceed sink at sinkLevel continue
     for(int level = sinkLevel; level <= depth; level++) {
-      // TODO: if sinkLevelDeps[k] cannot occur before sinkLevelDeps[j] at this level
-      // continue
+      // TODO: if sourceJ cannot preceed sourceJ at this level continue
       PresburgerSet trest = PresburgerSet::getEmpty(sinkLevelDeps[j].getSpace().getRangeSpace());
-      PresburgerRelation T = lastLaterSource(j, level, k, sinkLevel, trest);
+      PresburgerRelation T = lastLaterSource(sinkLevelDeps[j], j, level, k, sinkLevel, trest);
       if(T.isIntegerEmpty()) {
         continue;
       }
-      // TODO: sinkLevelDeps[j] = sinkLevelDeps[j].intersectRange(trest);
+      sinkLevelDeps[j] = sinkLevelDeps[j].intersectRange(trest);
       sinkLevelDeps[k].unionInPlace(T);
     }
   }
@@ -157,7 +155,6 @@ static PresburgerRelation SymbolicLexOptToPresburgerRelation(const SymbolicLexOp
 // .
 // .
 // sink
-// TODO: update mustNoSource/mayNoSource instead of passing empty
 PresburgerRelation DependenceAnalysis::lastLaterSource(PresburgerRelation curJDeps, int j, int afterLevel, int k, int sinkLevel, PresburgerSet &empty) {
   PresburgerRelation depMap = sink, writeMap = mustSources[k];
   writeMap.inverse();
