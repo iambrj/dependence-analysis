@@ -109,7 +109,7 @@ static PresburgerRelation afterAtLevel(PresburgerSpace depSpace, int level) {
 // TODO: update mustNoSource/mayNoSource
 // Compute the last iterations of a given source before the sink iterations at a
 // given level
-PresburgerRelation DependenceAnalysis::lastSource(PresburgerSet& set_c, PresburgerRelation source, unsigned level) {
+PresburgerRelation DependenceAnalysis::lastSource(PresburgerSet& set_C, PresburgerRelation source, unsigned level) {
   source.inverse();
   PresburgerRelation depMap = sink, result = PresburgerRelation::getEmpty(PresburgerSpace::getRelationSpace(source.getNumDomainVars(), sink.getNumDomainVars()));
   depMap.compose(source);
@@ -184,7 +184,14 @@ PresburgerRelation DependenceAnalysis::lastLaterSource(PresburgerRelation curJDe
   return SymbolicLexOptToPresburgerRelation(result);
 }
 
-PresburgerRelation DependenceAnalysis::allSources(unsigned must, unsigned j, unsigned level) {
+// Return all maySourceJ deps at given level for given sink iterations in set_C
+PresburgerRelation DependenceAnalysis::allSources(PresburgerSet& set_C, unsigned j, unsigned level) {
+  PresburgerRelation depMap = sink.intersectDomain(set_C), writeMap = maySources[j];
+  writeMap.inverse();
+  depMap.compose(writeMap);
+  PresburgerRelation after = afterAtLevel(depMap.getSpace(), level);
+  depMap.intersect(after);
+  return depMap;
 }
 
 PresburgerRelation DependenceAnalysis::allIntermediateSources(std::vector<PresburgerRelation> mustDeps, std::vector<PresburgerRelation> mayDeps, unsigned j, unsigned sinkLevel) {

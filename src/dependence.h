@@ -23,12 +23,9 @@ class DependenceAnalysis {
         maySourceMayDeps;
     } depMaps;
 
-    // XXX: pass set_c by reference or copy?
-    // what is the rule of thumb for choosing pass by reference or copy?
-    PresburgerRelation lastSource(PresburgerSet& set_c, PresburgerRelation source, unsigned level);
-    // XXX: pass deps by reference or copy?
+    PresburgerRelation lastSource(PresburgerSet& set_C, PresburgerRelation source, unsigned level);
     bool intermediateSources(std::vector<PresburgerRelation>& sources, unsigned j, unsigned level);
-    PresburgerRelation allSources(unsigned must, unsigned j, unsigned level);
+    PresburgerRelation allSources(PresburgerSet &set_C, unsigned j, unsigned level);
     PresburgerRelation allIntermediateSources(std::vector<PresburgerRelation>, std::vector<PresburgerRelation>, unsigned, unsigned);
     PresburgerRelation lastLaterSource(PresburgerRelation curJDeps, int j, int afterLevel, int k, int sinkLevel, PresburgerSet &trest);
     PresburgerRelation allLaterSources(std::vector<PresburgerRelation> mustDeps, std::vector<PresburgerRelation> mayDeps, unsigned j, unsigned level);
