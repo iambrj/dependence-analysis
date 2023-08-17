@@ -136,7 +136,7 @@ bool DependenceAnalysis::intermediateSources(std::vector<PresburgerRelation>& si
       // TODO: if sinkLevelDeps[k] cannot occur before sinkLevelDeps[j] at this level
       // continue
       PresburgerSet trest = PresburgerSet::getEmpty(sinkLevelDeps[j].getSpace().getRangeSpace());
-      PresburgerRelation T = lastLaterSource(j, sinkLevel, k, trest);
+      PresburgerRelation T = lastLaterSource(j, level, k, sinkLevel, trest);
       if(T.isIntegerEmpty()) {
         continue;
       }
@@ -146,15 +146,42 @@ bool DependenceAnalysis::intermediateSources(std::vector<PresburgerRelation>& si
   }
 }
 
-// In the iteration space (lexically may not be the case):
+static PresburgerRelation SymbolicLexOptToPresburgerRelation(const SymbolicLexOpt& s) {
+  // TODO
+}
+
 // source j <--- afterLevel
 // .
 // .
-// source k
+// source k <--- source k writes to same location as source j later
 // .
 // .
 // sink     <--- sinkLevel
-PresburgerRelation DependenceAnalysis::lastLaterSource(int j, int sinkLevel, int k, PresburgerSet empty) {
+PresburgerRelation DependenceAnalysis::lastLaterSource(PresburgerRelation curJDeps, int j, int afterLevel, int k, int sinkLevel, PresburgerSet &empty) {
+  PresburgerRelation depMap = sink, writeMap = mustSources[k];
+  writeMap.inverse();
+  depMap.compose(writeMap);// Sink -> SourceK dependencies
+
+  PresburgerSpace space = PresburgerSpace::getRelationSpace(mustSources[k].getNumDomainVars(), mustSources[j].getNumDomainVars());
+  // All possible SourceK iteration -> SourceJ iteration such that SourceK
+  // iteration is after SourceJ iteration
+  PresburgerRelation afterWrite = afterAtLevel(space, afterLevel);
+  // All possible SourceK iteration -> Sink such that SourceK is after
+  // corresponding SourceJ dependence in curJDeps
+  afterWrite.compose(curJDeps);
+  afterWrite.inverse();
+  depMap = depMap.intersect(afterWrite);// Sink -> SourceK dependencies
+  // s.t. SourceK dependence is after corresponding SourceJ dependence
+
+  PresburgerRelation beforeSinkRead = afterAtLevel(depMap.getSpace(), sinkLevel);
+  depMap = depMap.intersect(beforeSinkRead);// Sink -> SourceK dependencies
+  // s.t. SourceK dependence is after corresponding SourceJ dependence
+  // and Sink read is after SourceK write
+
+  empty = depMap.getDomainSet().subtract(curJDeps.getRangeSet());
+  depMap.intersectDomain(curJDeps.getRangeSet());
+  SymbolicLexOpt result = depMap.findSymbolicIntegerLexMax();
+  return SymbolicLexOptToPresburgerRelation(result);
 }
 
 PresburgerRelation DependenceAnalysis::allSources(unsigned must, unsigned j, unsigned level) {
