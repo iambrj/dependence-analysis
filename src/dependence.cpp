@@ -138,7 +138,7 @@ bool DependenceAnalysis::intermediateSources(std::vector<PresburgerRelation>& si
       if(T.isIntegerEmpty()) {
         continue;
       }
-      sinkLevelDeps[j] = sinkLevelDeps[j].intersectRange(trest);
+      sinkLevelDeps[j] = sinkLevelDeps[j].intersectDomain(trest);
       sinkLevelDeps[k].unionInPlace(T);
     }
   }
@@ -155,6 +155,8 @@ static PresburgerRelation SymbolicLexOptToPresburgerRelation(const SymbolicLexOp
 // .
 // .
 // sink
+//
+// Returns all such sink -> source k deps
 PresburgerRelation DependenceAnalysis::lastLaterSource(PresburgerRelation curJDeps, int j, int afterLevel, int k, int sinkLevel, PresburgerSet &empty) {
   PresburgerRelation depMap = sink, writeMap = mustSources[k];
   writeMap.inverse();
@@ -179,8 +181,8 @@ PresburgerRelation DependenceAnalysis::lastLaterSource(PresburgerRelation curJDe
   // and mustSourceK is after corresponding sourceJ dependence in curJDeps
   // and sink read is after SourceK write
 
-  empty = depMap.getDomainSet().subtract(curJDeps.getRangeSet());
-  depMap.intersectDomain(curJDeps.getRangeSet());
+  empty = curJDeps.getDomainSet().subtract(depMap.getDomainSet());
+  depMap = depMap.intersectDomain(curJDeps.getDomainSet());
   SymbolicLexOpt result = depMap.findSymbolicIntegerLexMax();
   return SymbolicLexOptToPresburgerRelation(result);
 }
@@ -205,6 +207,8 @@ PresburgerRelation DependenceAnalysis::allIntermediateSources(std::vector<Presbu
 // .
 // .
 // sink
+// 
+// Returns all suck sink -> maySourceJ deps
 PresburgerRelation DependenceAnalysis::allLaterSources(PresburgerRelation curKDeps, int j, int sinkLevel, int k, int afterLevel) {
   PresburgerRelation depMap = sink.intersectDomain(curKDeps.getRangeSet()), writeMap = maySources[j];
   writeMap.inverse();
