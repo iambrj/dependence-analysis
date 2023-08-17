@@ -28,7 +28,7 @@ class DependenceAnalysis {
     PresburgerRelation allSources(PresburgerSet &set_C, unsigned j, unsigned level);
     PresburgerRelation allIntermediateSources(std::vector<PresburgerRelation>, std::vector<PresburgerRelation>, unsigned, unsigned);
     PresburgerRelation lastLaterSource(PresburgerRelation curJDeps, int j, int afterLevel, int k, int sinkLevel, PresburgerSet &trest);
-    PresburgerRelation allLaterSources(std::vector<PresburgerRelation> mustDeps, std::vector<PresburgerRelation> mayDeps, unsigned j, unsigned level);
+    PresburgerRelation allLaterSources(PresburgerRelation curKDeps, int j, int sinkLevel, int k, int afterLevel);
   public:
     DependenceAnalysis(PresburgerRelation sink, ArrayRef<PresburgerRelation> maySources,
         ArrayRef<PresburgerRelation> mustSources) : sink(sink),
